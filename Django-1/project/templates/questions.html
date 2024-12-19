@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <ul>
+        {% for question in questions %}
+        <li>
+            <strong>{{ question.text }}</strong>
+            <ul>
+                {% for answer in question.answer_set.all %}
+                <li>
+                    <label>
+                        <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
+                        {{ answer.text }}
+                    </label>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Submit</button>
+</form>
+
+<hr>
+
+{% if results %}
+<h2>Results</h2>
+<ul>
+    {% for result in results %}
+    <li>
+        <strong>{{ result.question.text }}</strong><br>
+        <span>Your answer: 
+            {% if result.selected_answer %}
+            {{ result.selected_answer.text }}
+            {% else %}
+            No answer
+            {% endif %}
+        </span><br>
+        {% if result.is_correct %}
+        <span style="color: green;">Correct!</span>
+        {% else %}
+        <span style="color: red;">Wrong!</span><br>
+        <span>Correct answer(s): 
+            {% for answer in result.correct_answers %}
+            {{ answer.text }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </span>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
